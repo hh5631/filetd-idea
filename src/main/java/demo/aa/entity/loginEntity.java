@@ -1,2 +1,8 @@
-package demo.aa.entity;public class loginEntity {
+package demo.aa.entity;
+
+public class loginEntity {
+
+    private String username;
+    private String password;
+    private String photo;
 }
