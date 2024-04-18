@@ -3,10 +3,12 @@ package demo.aa.service;
 import demo.aa.entity.fileTDEntity;
 import demo.aa.mapper.fileTDMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,6 +18,8 @@ import java.util.List;
 public class fileTDService {
     @Autowired
     public fileTDMapper fileTDMapper;
+    @Autowired
+    private Environment environment;
 
     public Resource loadFileAsResource(String filePath) {
         try {
@@ -32,8 +36,7 @@ public class fileTDService {
     }
     public void save(String fileName){
         if(fileTDMapper.findByFileName(fileName)==null){
-//            String filePath = "/home/hh/FileTD/Trans/" + fileName;
-            String filePath = "C:\\Users\\19878\\hh\\Trans\\" + fileName;
+            String filePath = environment.getProperty("savePath") + fileName;
 
             fileTDMapper.save(fileName,filePath);
         }
@@ -45,6 +48,7 @@ public class fileTDService {
 
     public void delete(String fileName) {
         fileTDMapper.deleteByFileName(fileName);
+        new File(environment.getProperty("savePath") + fileName).delete();;
     }
 
 }

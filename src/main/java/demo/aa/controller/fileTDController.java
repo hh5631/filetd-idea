@@ -3,6 +3,7 @@ package demo.aa.controller;
 import demo.aa.entity.fileTDEntity;
 import demo.aa.service.fileTDService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -24,29 +25,20 @@ public class fileTDController {
     @Autowired
     public fileTDService fileTDService;
 
+    @Autowired
+    private Environment environment;
+
     fileTDEntity fileTDEntity;
+    @GetMapping("/download")
+    public ResponseEntity<Resource> downloadFile(String filepath) {
+        // 设置实际的文件路径
+        PathResource file = new PathResource(filepath);
 
-//    @GetMapping("/download")
-//    public ResponseEntity<Resource> downloadFile(String filepath) {
-//
-//        // 设置实际的文件路径
-//
-//        Resource file = fileTDService.loadFileAsResource(filepath);
-//
-//        return ResponseEntity.ok()
-//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
-//                .body(file);
-//    }
-@GetMapping("/download")
-public ResponseEntity<Resource> downloadFile(String filepath) {
-    // 设置实际的文件路径
-    PathResource file = new PathResource(filepath);
-
-    return ResponseEntity.ok()
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
-            .contentType(MediaType.parseMediaType("application/octet-stream")) // 设置文件的 MIME 类型
-            .body(file);
-}
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                .contentType(MediaType.parseMediaType("application/octet-stream")) // 设置文件的 MIME 类型
+                .body(file);
+    }
     @GetMapping("/delete")
     public String deleteFile(String fileName) {
         fileTDService.delete(fileName);
@@ -55,11 +47,9 @@ public ResponseEntity<Resource> downloadFile(String filepath) {
 
     @PostMapping("upload")
     public String upload(MultipartFile file) throws IOException {
-        System.out.println(file.getOriginalFilename());
-        System.out.println(file.getSize());
-        file.transferTo(new File("C:\\Users\\19878\\hh\\Trans\\" + file.getOriginalFilename()));
-        //file.transferTo(new File("/home/hh/FileTD/Trans/" + file.getOriginalFilename()));
-
+        System.out.println("上传文件: " + file.getOriginalFilename()+" 大小: "+file.getSize());
+        String filePath = environment.getProperty("savePath") + file.getOriginalFilename();
+        file.transferTo(new File(filePath));
         fileTDService.save(file.getOriginalFilename());
         return "success";
     }
@@ -69,12 +59,6 @@ public ResponseEntity<Resource> downloadFile(String filepath) {
         return fileTDService.showAll();
     }
 
-    @GetMapping("/send")
-    public String send(String message){
-        System.out.println(message);
-        return "success";
-
-    }
 
 
 }
