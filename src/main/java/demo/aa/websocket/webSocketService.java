@@ -1,6 +1,7 @@
 package demo.aa.websocket;
 
 import com.google.gson.Gson;
+import demo.aa.entity.message;
 import demo.aa.entity.webSocket;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnMessage;
@@ -19,6 +20,7 @@ import java.util.*;
 @Service
 public class webSocketService {
 
+    message mess = new message();
     public static final Map<Session,String> sessionMap = new HashMap<>();
 
 
@@ -28,7 +30,12 @@ public class webSocketService {
     public void OnOpen(Session session,@PathParam(value = "name") String name){
 
         sessionMap.put(session,name);
-
+        mess.setType("message");
+        mess.setData("欢迎"+name+"进入聊天室");
+        broadcastAllUsers(new Gson().toJson(mess));
+        mess.setType("online");
+        mess.setData(new Gson().toJson(sessionMap.values()));
+        broadcastAllUsers(new Gson().toJson(mess));
     }
     @OnMessage
     public void  OnMessage(@PathParam(value = "name") String name, String message){
@@ -36,8 +43,11 @@ public class webSocketService {
         messageItem.name =name;
         messageItem.message=message;
         list.add(messageItem);
-        broadcastAllUsers(name+" :    "+message);
+        mess.setType("message");
+        mess.setData(name+" :    "+message);
+        broadcastAllUsers(new Gson().toJson(mess));
     }
+
 
     private void broadcastAllUsers(String message){
 
@@ -58,8 +68,10 @@ public class webSocketService {
 
 
     public String getAllMessage() {
-        System.out.println(list);
-        System.out.println(list.get(0).name+list.get(0).message);
        return new Gson().toJson(list);
+    }
+
+    public String getOnlineUser() {
+        return new Gson().toJson(sessionMap.values());
     }
 }

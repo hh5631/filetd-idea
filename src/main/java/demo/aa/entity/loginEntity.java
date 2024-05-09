@@ -4,4 +4,5 @@ public class loginEntity {
 
     private String username;
     private String password;
+
 }

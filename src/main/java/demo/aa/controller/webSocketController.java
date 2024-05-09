@@ -20,4 +20,9 @@ public class webSocketController {
 
         return  websocketService.getAllMessage();
     }
+    @GetMapping("/getOnlineUser")
+    public String getOnlineUser(){
+
+        return websocketService.getOnlineUser();
+    }
 }

@@ -19,9 +19,6 @@ public class loginService {
         String res = "login fail";
 
         String ps=loginMapper.findPasswdByUname(username);
-        System.out.println(username);
-        System.out.println(password);
-        System.out.println(ps);
         try {
             if (ps.equals(password)){
                 res= "login success";
